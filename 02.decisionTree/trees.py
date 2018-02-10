@@ -108,7 +108,7 @@ def createTree(dataSet, labels):
 
 
 def classify(inputTree, featLabels, testVec):
-    firstStr = inputTree.keys()[0]
+    firstStr = list(inputTree.keys())[0]
     #print("fistStr : "+firstStr)
     secondDict = inputTree[firstStr]
     #print("secondDict : " + str(secondDict))

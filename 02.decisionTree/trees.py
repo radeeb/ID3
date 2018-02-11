@@ -7,15 +7,22 @@ from math import log
 import operator
 
 def createDataSet():
-    dataSet = [[0, 1, 1, 'yes'],
-               [0, 1, 0, 'no'],
-               [1, 0, 1, 'no'],
-               [1, 1, 1, 'no'],
-               [0, 1, 0, 'no'],
-               [0, 0, 1, 'no'],
-               [1, 0, 1, 'no'],
-               [1, 1, 0, 'no']]
-    labels = ['cartoon', 'winter', 'more than 1 person']
+    dataSet = [['senior' ,'java', 'no', 'no', 'false'],
+               ['senior' ,'java', 'no', 'yes', 'false'],
+               ['mid', 'python', 'no', 'no', 'true'],
+               ['juinor', 'python', 'no', 'no', 'true'],
+               ['junior', 'R', 'yes', 'no', 'true'],
+               ['junior', 'R', 'yes', 'yes', 'false'],
+               ['mid', 'R', 'yes', 'yes', 'true'],
+               ['senior', 'python', 'no', 'no', 'false'],
+               ['senior', 'R', 'yes', 'no', 'true'],
+               ['junior', 'python', 'yes', 'no', 'true'],
+               ['senior', 'python', 'yes', 'yes' ,'true'],
+               ['mid', 'python', 'no', 'yes', 'true'],
+               ['mid', 'java', 'yes', 'no', 'true'],
+               ['junior', 'python', 'no', 'yes', 'false']]
+               
+    labels = ['level', 'language', 'tweets', 'phd']
     # change to discrete values
     return dataSet, labels
 
@@ -82,7 +89,7 @@ def majorityCnt(classList):
 
 def createTree(dataSet, labels):
     # extracting data
-    classList = [example[-1] for example in dataSet]
+    classList = [example[-1] for example in dataSet]  #[y, n n n n n n n]
     if classList.count(classList[0]) == len(classList):
         return classList[0]  # stop splitting when all of the classes are equal
     if len(dataSet[0]) == 1:  # stop splitting when there are no more features in dataSet

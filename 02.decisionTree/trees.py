@@ -32,6 +32,7 @@ def createDataSet(data):
         
     return dataTable, labels
 
+
 def calcShannonEnt(dataSet):
     numEntries = len(dataSet)
     labelCounts = {}

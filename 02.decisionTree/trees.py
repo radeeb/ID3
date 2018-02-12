@@ -6,7 +6,7 @@ def createDataSet():
     dataSet = [['senior' ,'java', 'no', 'no', 'false'],
                ['senior' ,'java', 'no', 'yes', 'false'],
                ['mid', 'python', 'no', 'no', 'true'],
-               ['juinor', 'python', 'no', 'no', 'true'],
+               ['junior', 'python', 'no', 'no', 'true'],
                ['junior', 'R', 'yes', 'no', 'true'],
                ['junior', 'R', 'yes', 'yes', 'false'],
                ['mid', 'R', 'yes', 'yes', 'true'],

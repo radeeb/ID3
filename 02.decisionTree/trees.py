@@ -33,7 +33,7 @@ def createDataSet(data):
     return dataTable, labels
 
 
-def calcShannonEnt(dataSet):
+def entropy(dataSet):
     numEntries = len(dataSet)
     labelCounts = {}
     for featVec in dataSet:  # the the number of unique elements and their occurance
@@ -57,35 +57,38 @@ def splitDataSet(dataSet, axis, value):
     return retDataSet
 
 
-def chooseBestFeatureToSplit(dataSet):
-    numFeatures = len(dataSet[0]) - 1  # the last column is used for the labels
-    baseEntropy = calcShannonEnt(dataSet)
-    bestInfoGain = 0.0;
-    bestFeature = -1
-    for i in range(numFeatures):  # iterate over all the features
-        featList = [example[i] for example in dataSet]  # create a list of all the examples of this feature
-        uniqueVals = set(featList)  # get a set of unique values
-        newEntropy = 0.0
-        for value in uniqueVals:
-            subDataSet = splitDataSet(dataSet, i, value)
-            prob = len(subDataSet) / float(len(dataSet))
-            newEntropy += prob * calcShannonEnt(subDataSet)
+def NodeSelection(dataTable):
+    '''
+    Calculates the entropy of the whole system first, then iterates o
+    '''
+    entropy_for_system = entropy(dataTable)
+    highest_info_gain = 0.0;
+    selected_attribute = 0
+    attributesCount = len(dataTable[0]) - 1
+
+    for i in range(attributesCount):
+        attributes_all = [row[i] for row in dataTable]
+        attributes = set(attributes_all)
+        finalEntropy = 0.0
+        for att in attributes:
+            subTable = splitDataSet(dataTable, i, att)
+            prob = len(subTable) / float(len(dataTable))
+            finalEntropy += prob * entropy(subTable)
 
 
-        infoGain = baseEntropy - newEntropy  # calculate the info gain; ie reduction in entropy
-        """
-        print("feature : " + str(i))
-        print("baseEntropy : "+str(baseEntropy))
-        print("newEntropy : " + str(newEntropy))
-        print("infoGain : " + str(infoGain))
-        """
-        if (infoGain > bestInfoGain):  # compare this to the best gain so far
-            bestInfoGain = infoGain  # if better than current best, set to best
-            bestFeature = i
-    return bestFeature  # returns an integer
+        information_gain = entropy_for_system - finalEntropy  # calculate the info gain; ie reduction in entropy
+
+        if (information_gain > highest_info_gain):  # compare this to the best gain so far
+            highest_info_gain = information_gain  # if better than current best, set to best
+            selected_attribute = i
+    return selected_attribute  # returns an integer
 
 
 def majority_voting(decision):
+    '''
+    returns the most popular element from the list given
+    '''
+
     return Counter(decision).most_common()[0][1] > (len(decision) // 2)
 
 
@@ -98,22 +101,16 @@ def createTree(dataTable, labels):
 
     #### Changed up to this part.
 
-    bestFeat = chooseBestFeatureToSplit(dataTable)
+    bestFeat = NodeSelection(dataTable)
     bestFeatLabel = labels[bestFeat]
 
-    #build a tree recursively
     myTree = {bestFeatLabel: {}}
-    #print("myTree : "+labels[bestFeat])
     del (labels[bestFeat])
     featValues = [example[bestFeat] for example in dataTable]
-    #print("featValues: "+str(featValues))
     uniqueVals = set(featValues)
-    #print("uniqueVals: " + str(uniqueVals))
     for value in uniqueVals:
         subLabels = labels[:]  # copy all of labels, so trees don't mess up existing labels
-        #print("subLabels"+str(subLabels))
         myTree[bestFeatLabel][value] = createTree(splitDataSet(dataTable, bestFeat, value), subLabels)
-        #print("myTree : " + str(myTree))
     return myTree
 
 

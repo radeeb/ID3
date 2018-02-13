@@ -1,28 +1,39 @@
 
 from math import log
 import operator
+from collections import Counter
 
-def createDataSet():
-    dataSet = [['senior' ,'java', 'no', 'no', 'false'],
-               ['senior' ,'java', 'no', 'yes', 'false'],
-               ['mid', 'python', 'no', 'no', 'true'],
-               ['junior', 'python', 'no', 'no', 'true'],
-               ['junior', 'R', 'yes', 'no', 'true'],
-               ['junior', 'R', 'yes', 'yes', 'false'],
-               ['mid', 'R', 'yes', 'yes', 'true'],
-               ['senior', 'python', 'no', 'no', 'false'],
-               ['senior', 'R', 'yes', 'no', 'true'],
-               ['junior', 'python', 'yes', 'no', 'true'],
-               ['senior', 'python', 'yes', 'yes' ,'true'],
-               ['mid', 'python', 'no', 'yes', 'true'],
-               ['mid', 'java', 'yes', 'no', 'true'],
-               ['junior', 'python', 'no', 'yes', 'false']]
-               
-    labels = ['level', 'language', 'tweets', 'phd']
-    # change to discrete values
-    return dataSet, labels
+training_data = [
+({'level':'Senior', 'lang':'Java', 'tweets':'no', 'phd':'no'}, False),
+({'level':'Senior', 'lang':'Java', 'tweets':'no', 'phd':'yes'}, False),
+({'level':'Mid', 'lang':'Python', 'tweets':'no', 'phd':'no'}, True),
+({'level':'Junior', 'lang':'Python', 'tweets':'no', 'phd':'no'}, True),
+({'level':'Junior', 'lang':'R', 'tweets':'yes', 'phd':'no'}, True),
+({'level':'Junior', 'lang':'R', 'tweets':'yes', 'phd':'yes'}, False),
+({'level':'Mid', 'lang':'R', 'tweets':'yes', 'phd':'yes'}, True),
+({'level':'Senior', 'lang':'Python', 'tweets':'no', 'phd':'no'}, False),
+({'level':'Senior', 'lang':'R', 'tweets':'yes', 'phd':'no'}, True),
+({'level':'Junior', 'lang':'Python', 'tweets':'yes', 'phd':'no'}, True),
+({'level':'Senior', 'lang':'Python', 'tweets':'yes', 'phd':'yes'}, True),
+({'level':'Mid', 'lang':'Python', 'tweets':'no', 'phd':'yes'}, True),
+({'level':'Mid', 'lang':'Java', 'tweets':'yes', 'phd':'no'}, True),
+({'level':'Junior', 'lang':'Python', 'tweets':'no', 'phd':'yes'}, False)
+]
 
-def calcShannonEnt(dataSet):
+def createDataSet(data):
+
+    dataTable = []
+
+    for tup in data:
+        dataRow = list(tup[0].values())
+        dataRow.append(tup[1])
+        dataTable.append(dataRow)
+        labels = list(tup[0].keys())
+        
+    return dataTable, labels
+
+
+def entropy(dataSet):
     numEntries = len(dataSet)
     labelCounts = {}
     for featVec in dataSet:  # the the number of unique elements and their occurance
@@ -46,67 +57,60 @@ def splitDataSet(dataSet, axis, value):
     return retDataSet
 
 
-def chooseBestFeatureToSplit(dataSet):
-    numFeatures = len(dataSet[0]) - 1  # the last column is used for the labels
-    baseEntropy = calcShannonEnt(dataSet)
-    bestInfoGain = 0.0;
-    bestFeature = -1
-    for i in range(numFeatures):  # iterate over all the features
-        featList = [example[i] for example in dataSet]  # create a list of all the examples of this feature
-        uniqueVals = set(featList)  # get a set of unique values
-        newEntropy = 0.0
-        for value in uniqueVals:
-            subDataSet = splitDataSet(dataSet, i, value)
-            prob = len(subDataSet) / float(len(dataSet))
-            newEntropy += prob * calcShannonEnt(subDataSet)
+def NodeSelection(dataTable):
+    '''
+    Calculates the entropy of the whole system first, then iterates o
+    '''
+    entropy_for_system = entropy(dataTable)
+    highest_info_gain = 0.0;
+    selected_attribute = 0
+    attributesCount = len(dataTable[0]) - 1
+
+    for i in range(attributesCount):
+        attributes_all = [row[i] for row in dataTable]
+        attributes = set(attributes_all)
+        finalEntropy = 0.0
+        for att in attributes:
+            subTable = splitDataSet(dataTable, i, att)
+            prob = len(subTable) / float(len(dataTable))
+            finalEntropy += prob * entropy(subTable)
 
 
-        infoGain = baseEntropy - newEntropy  # calculate the info gain; ie reduction in entropy
-        """
-        print("feature : " + str(i))
-        print("baseEntropy : "+str(baseEntropy))
-        print("newEntropy : " + str(newEntropy))
-        print("infoGain : " + str(infoGain))
-        """
-        if (infoGain > bestInfoGain):  # compare this to the best gain so far
-            bestInfoGain = infoGain  # if better than current best, set to best
-            bestFeature = i
-    return bestFeature  # returns an integer
+        information_gain = entropy_for_system - finalEntropy  # calculate the info gain; ie reduction in entropy
+
+        if (information_gain > highest_info_gain):  # compare this to the best gain so far
+            highest_info_gain = information_gain  # if better than current best, set to best
+            selected_attribute = i
+    return selected_attribute  # returns an integer
 
 
-def majorityCnt(classList):
-    classCount = {}
-    for vote in classList:
-        if vote not in classCount.keys(): classCount[vote] = 0
-        classCount[vote] += 1
-    sortedClassCount = sorted(classCount.iteritems(), key=operator.itemgetter(1), reverse=True)
-    return sortedClassCount[0][0]
+def majority_voting(decision):
+    '''
+    returns the most popular element from the list given
+    '''
+
+    return Counter(decision).most_common()[0][1] > (len(decision) // 2)
 
 
-def createTree(dataSet, labels):
-    # extracting data
-    classList = [example[-1] for example in dataSet]  #[y, n n n n n n n]
-    if classList.count(classList[0]) == len(classList):
-        return classList[0]  # stop splitting when all of the classes are equal
-    if len(dataSet[0]) == 1:  # stop splitting when there are no more features in dataSet
-        return majorityCnt(classList)
-    # use Information Gain
-    bestFeat = chooseBestFeatureToSplit(dataSet)
+def createTree(dataTable, labels):
+    decision = [row[-1] for row in dataTable]  #[y, n n n n n n n]
+    if decision.count(decision[0]) == len(decision):
+        return decision[0]              # return when all of the decision in the dataTable is same
+    if len(dataTable[0]) == 1:
+        return majority_voting(decision)    # return if there is only one remaining feature in dataTable
+
+    #### Changed up to this part.
+
+    bestFeat = NodeSelection(dataTable)
     bestFeatLabel = labels[bestFeat]
 
-    #build a tree recursively
     myTree = {bestFeatLabel: {}}
-    #print("myTree : "+labels[bestFeat])
     del (labels[bestFeat])
-    featValues = [example[bestFeat] for example in dataSet]
-    #print("featValues: "+str(featValues))
+    featValues = [example[bestFeat] for example in dataTable]
     uniqueVals = set(featValues)
-    #print("uniqueVals: " + str(uniqueVals))
     for value in uniqueVals:
         subLabels = labels[:]  # copy all of labels, so trees don't mess up existing labels
-        #print("subLabels"+str(subLabels))
-        myTree[bestFeatLabel][value] = createTree(splitDataSet(dataSet, bestFeat, value), subLabels)
-        #print("myTree : " + str(myTree))
+        myTree[bestFeatLabel][value] = createTree(splitDataSet(dataTable, bestFeat, value), subLabels)
     return myTree
 
 
@@ -142,22 +146,11 @@ def grabTree(filename):
     fr = open(filename)
     return pickle.load(fr)
 
-# collect data
-myDat, labels = createDataSet()
 
-#build a tree
-mytree = createTree(myDat, labels)
-print(mytree)
 
-print("Thanks, now I can recognize winter family photo, give me any photo")
+if __name__ == "__main__":
 
-#run test
-
-# test with winter family photo
-answer = classify(mytree, ['cartoon', 'winter', 'more than 1 person'], [0, 1, 1])
-print("Hi, the answer is "+ answer + ", it is winter family photo")
-
-# test with cartoon characters winter pictures
-answer = classify(mytree, ['cartoon', 'winter', 'more than 1 person'], [1, 1, 1])
-print("Hi, the answer is "+ answer + ", it is not winter family photo")
+    myDat, labels = createDataSet(training_data)
+    mytree = createTree(myDat, labels)
+    print(mytree)
 

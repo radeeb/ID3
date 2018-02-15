@@ -2,8 +2,11 @@
 from math import log
 import operator
 from collections import Counter
+import pandas as pd
 
-training_data = [
+training_data1 = pd.read_csv('iris.csv') #read the csv file into a dataframe
+
+training_data2 = [
 ({'level':'Senior', 'lang':'Java', 'tweets':'no', 'phd':'no'}, False),
 ({'level':'Senior', 'lang':'Java', 'tweets':'no', 'phd':'yes'}, False),
 ({'level':'Mid', 'lang':'Python', 'tweets':'no', 'phd':'no'}, True),
@@ -20,6 +23,7 @@ training_data = [
 ({'level':'Junior', 'lang':'Python', 'tweets':'no', 'phd':'yes'}, False)
 ]
 
+
 def createDataSet(data):
 
     dataTable = []
@@ -29,9 +33,17 @@ def createDataSet(data):
         dataRow.append(tup[1])
         dataTable.append(dataRow)
         labels = list(tup[0].keys())
-        
+
     return dataTable, labels
 
+#similar method but for extracting from the dataFrame
+def createDataSetCsv(data):
+    dataLabels= ['Iris Setosa', 'Iris Versicolour', 'Iris Virginica']
+
+    dataTable = training_data1.values.tolist() #Use .values to get a numpy.array and then .tolist() to get a list.
+    dataTable.append(dataLabels)
+
+    return dataTable, dataLabels
 
 def entropy(dataSet):
     numEntries = len(dataSet)
@@ -150,7 +162,10 @@ def grabTree(filename):
 
 if __name__ == "__main__":
 
-    myDat, labels = createDataSet(training_data)
-    mytree = createTree(myDat, labels)
-    print(mytree)
+    myDat, labels = createDataSetCsv(training_data1) #for given training data
+    #mytree = createTree(myDat, labels)
+    #print(mytree)
+
+    print(createDataSet(training_data2))
+    print(createDataSetCsv(training_data1))
 

@@ -24,7 +24,7 @@ training_data2 = [
 ]
 
 
-def createDataTable(data):
+def createDataSet(data):
 
     dataTable = []
 
@@ -165,6 +165,10 @@ if __name__ == "__main__":
     myDat, labels = createDataSetCsv(training_data1) #for given training data
     mytree = createTree(myDat, labels)
     print(mytree)
+
+    myDat1, labels1 = createDataSet(training_data2)  # for given training data
+    mytree1 = createTree(myDat1, labels1)
+    print(mytree1)
 
     #print(createDataTable(training_data2))
     #print(createDataSetCsv(training_data1))

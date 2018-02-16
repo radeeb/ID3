@@ -163,16 +163,19 @@ def grabTree(filename):
 
 if __name__ == "__main__":
 
-    myDat, labels = createDataSetCsv(training_data1) #for given training data
-    mytree1 = createTree(myDat, labels)
-    print(mytree1)
-
-
-    #myDat1, labels1 = createDataSet(training_data2)  # for given training data
-    #mytree1 = createTree(myDat1, labels1)
+    ######testing for csv data######
+    #myDat, labels = createDataSetCsv(training_data1) #for given training data
+    #mytree1 = createTree(myDat, labels)
     #print(mytree1)
-    answer = classify(mytree1, ['sepal length', 'sepal width', 'petal length', 'petal width'],
-                      [4.6, 3.4, 1.4, 0.2])
+    #answer = classify(mytree1, ['sepal length', 'sepal width', 'petal length', 'petal width'],
+                      #[4.6, 3.4, 1.4, 0.2])
+
+    ####testing for builtin data######
+    myDat1, labels1 = createDataSet(training_data2)  # for given training data
+    mytree1 = createTree(myDat1, labels1)
+    print(mytree1)
+    answer = classify(mytree1, ['level', 'lang', 'tweets', 'phd'],
+                      ['Senior', 'Java', 'no', 'no'])
     #print((answer)
     print("is person hired? ", answer)
 

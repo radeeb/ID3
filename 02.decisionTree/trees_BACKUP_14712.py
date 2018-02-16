@@ -145,6 +145,21 @@ def classify(inputTree, test_data):
 
 if __name__ == "__main__":
 
+<<<<<<< HEAD
+    ######testing for csv data######
+    #myDat, labels = createDataSetCsv(training_data1) #for given training data
+    #mytree1 = createTree(myDat, labels)
+    #print(mytree1)
+    #answer = classify(mytree1, ['sepal length', 'sepal width', 'petal length', 'petal width'],
+                      #[4.6, 3.4, 1.4, 0.2])
+
+    ####testing for builtin data######
+    myDat1, labels1 = createDataSet(training_data2)  # for given training data
+    mytree1 = createTree(myDat1, labels1)
+    print(mytree1)
+    answer = classify(mytree1, ['level', 'lang', 'tweets', 'phd'],
+                      ['Senior', 'Java', 'no', 'no'])
+=======
     # FROM CSV
     myDat, labels = createDataSetCsv(training_data1) #for given training data
     mytree1 = createTree(myDat, labels)
@@ -160,6 +175,7 @@ if __name__ == "__main__":
     mytree2 = createTree(myDat1, labels1)
     #print(mytree2)
 
+>>>>>>> dce79768be85f545348177a4cf49ef93aac00630
     #print((answer)
     test1 = {"level" : "Junior","lang" : "Java","tweets" : "yes","phd" : "no"}  #True
     test2 = {"level" : "Junior","lang" : "Java","tweets" : "yes","phd" : "yes"} #False
@@ -169,3 +185,4 @@ if __name__ == "__main__":
 
     #print(createDataTable(training_data2))
     #print(createDataSetCsv(training_data1))
+

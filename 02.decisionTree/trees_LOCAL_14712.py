@@ -128,44 +128,57 @@ def createTree(dataTable, labels):
 
 
 
-def classify(inputTree, test_data):
-    labels = list(test_data.keys())
-    test_values = list(test_data.values())
-    root_node = list(inputTree.keys())[0]
-    branches = inputTree[root_node]
-    labels_index = labels.index(root_node)
-    key = test_values[labels_index]
-    value = branches[key]
-
-    if isinstance(value, dict):
-        classLabel = classify(value, test_data)
+def classify(inputTree, featLabels, testVec):
+    firstStr = list(inputTree.keys())[0]
+    #print("fistStr : "+firstStr)
+    secondDict = inputTree[firstStr]
+    #print("secondDict : " + str(secondDict))
+    featIndex = featLabels.index(firstStr)
+    #print("featIndex : " + str(featIndex))
+    key = testVec[featIndex]
+    #print("key : " + str(key))
+    valueOfFeat = secondDict[key]
+    #print("valueOfFeat : " + str(valueOfFeat))
+    if isinstance(valueOfFeat, dict):
+        #print("is instance: "+str(valueOfFeat))
+        classLabel = classify(valueOfFeat, featLabels, testVec)
     else:
-        classLabel = value
+        #print("is Not instance: " + valueOfFeat)
+        classLabel = valueOfFeat
     return classLabel
+
+
+def storeTree(inputTree, filename):
+    import pickle
+    fw = open(filename, 'w')
+    pickle.dump(inputTree, fw)
+    fw.close()
+
+
+def grabTree(filename):
+    import pickle
+    fr = open(filename)
+    return pickle.load(fr)
+
 
 if __name__ == "__main__":
 
-    # FROM CSV
-    myDat, labels = createDataSetCsv(training_data1) #for given training data
-    mytree1 = createTree(myDat, labels)
+    ######testing for csv data######
+    #myDat, labels = createDataSetCsv(training_data1) #for given training data
+    #mytree1 = createTree(myDat, labels)
     #print(mytree1)
+    #answer = classify(mytree1, ['sepal length', 'sepal width', 'petal length', 'petal width'],
+                      #[4.6, 3.4, 1.4, 0.2])
 
-    test_plant = {'sepal length':4.6, 'sepal width':3.4, 'petal length':1.4, 'petal width':0.2}
-    answer = classify(mytree1, test_plant)
-    print(answer)
-
-    # FOR HW
-
+    ####testing for builtin data######
     myDat1, labels1 = createDataSet(training_data2)  # for given training data
-    mytree2 = createTree(myDat1, labels1)
-    #print(mytree2)
-
+    mytree1 = createTree(myDat1, labels1)
+    print(mytree1)
+    answer = classify(mytree1, ['level', 'lang', 'tweets', 'phd'],
+                      ['Senior', 'Java', 'no', 'no'])
     #print((answer)
-    test1 = {"level" : "Junior","lang" : "Java","tweets" : "yes","phd" : "no"}  #True
-    test2 = {"level" : "Junior","lang" : "Java","tweets" : "yes","phd" : "yes"} #False
-    answer1 = classify(mytree2, test1)
-    answer2 = classify(mytree2, test2)
-    print(answer1, answer2)
+    print("is person hired? ", answer)
 
     #print(createDataTable(training_data2))
     #print(createDataSetCsv(training_data1))
+

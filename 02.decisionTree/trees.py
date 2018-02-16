@@ -126,6 +126,8 @@ def createTree(dataTable, labels):
     return myTree
 
 
+
+
 def classify(inputTree, featLabels, testVec):
     firstStr = list(inputTree.keys())[0]
     #print("fistStr : "+firstStr)
@@ -159,16 +161,20 @@ def grabTree(filename):
     return pickle.load(fr)
 
 
-
 if __name__ == "__main__":
 
     myDat, labels = createDataSetCsv(training_data1) #for given training data
-    mytree = createTree(myDat, labels)
-    print(mytree)
-
-    myDat1, labels1 = createDataSet(training_data2)  # for given training data
-    mytree1 = createTree(myDat1, labels1)
+    mytree1 = createTree(myDat, labels)
     print(mytree1)
+
+
+    #myDat1, labels1 = createDataSet(training_data2)  # for given training data
+    #mytree1 = createTree(myDat1, labels1)
+    #print(mytree1)
+    answer = classify(mytree1, ['sepal length', 'sepal width', 'petal length', 'petal width'],
+                      [4.6, 3.4, 1.4, 0.2])
+    #print((answer)
+    print("is person hired? ", answer)
 
     #print(createDataTable(training_data2))
     #print(createDataSetCsv(training_data1))

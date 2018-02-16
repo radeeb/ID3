@@ -24,7 +24,7 @@ training_data2 = [
 ]
 
 
-def createDataSet(data):
+def createDataTable(data):
 
     dataTable = []
 
@@ -38,15 +38,15 @@ def createDataSet(data):
 
 #similar method but for extracting from the dataFrame
 def createDataSetCsv(data):
-    dataLabels= ['Iris Setosa', 'Iris Versicolour', 'Iris Virginica']
+    dataLabels= ['sepal length', 'sepal width', 'petal length', 'petal width']
 
     dataTable = training_data1.values.tolist() #Use .values to get a numpy.array and then .tolist() to get a list.
-    dataTable.append(dataLabels)
+    #dataTable.append(dataLabels)
+    #print(dataTable[0])
 
     return dataTable, dataLabels
 
 def entropy(dataSet):
-    numEntries = len(dataSet)
     labelCounts = {}
     for featVec in dataSet:  # the the number of unique elements and their occurance
         currentLabel = featVec[-1]
@@ -54,7 +54,7 @@ def entropy(dataSet):
         labelCounts[currentLabel] += 1
     shannonEnt = 0.0
     for key in labelCounts:
-        prob = float(labelCounts[key]) / numEntries
+        prob = float(labelCounts[key]) /  len(dataSet)
         shannonEnt -= prob * log(prob, 2)  # log base 2
     return shannonEnt
 
@@ -163,9 +163,9 @@ def grabTree(filename):
 if __name__ == "__main__":
 
     myDat, labels = createDataSetCsv(training_data1) #for given training data
-    #mytree = createTree(myDat, labels)
-    #print(mytree)
+    mytree = createTree(myDat, labels)
+    print(mytree)
 
-    print(createDataSet(training_data2))
-    print(createDataSetCsv(training_data1))
+    #print(createDataTable(training_data2))
+    #print(createDataSetCsv(training_data1))
 

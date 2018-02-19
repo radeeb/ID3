@@ -6,7 +6,7 @@ import pandas as pd
 training_data1 = pd.read_csv('iris.csv') #read the csv file into a dataframe
 
 training_data2 = [
-({'level':'Intern', 'lang':'Java', 'tweets':'no', 'phd':'no'}, False),
+({'level':'Senior', 'lang':'Java', 'tweets':'no', 'phd':'no'}, False),
 ({'level':'Senior', 'lang':'Java', 'tweets':'no', 'phd':'yes'}, False),
 ({'level':'Mid', 'lang':'Python', 'tweets':'no', 'phd':'no'}, True),
 ({'level':'Junior', 'lang':'Python', 'tweets':'no', 'phd':'no'}, True),
@@ -69,7 +69,7 @@ def createTree(dataTable, labels):
     decision = [row[-1] for row in dataTable]
 
     dataCounter = Counter(decision) #to find the most common class
-    majorityClass = str(dataCounter.most_common(1)[0][0]) #set the value to majorityClass
+    majorityClass = dataCounter.most_common(1)[0][0] #set the value to majorityClass
 
     if decision.count(decision[0]) == len(decision):
         return decision[0]              # return when all of the decision in the dataTable is same
@@ -81,9 +81,9 @@ def createTree(dataTable, labels):
     del (labels[root_attribute])  # reducing the dataTable so the recursion will work
     attributeValuesAll = [row[root_attribute] for row in dataTable]
     attribute_values = set(attributeValuesAll)  # finding the unique values
-    attribute_values.add('None')
+    attribute_values.add(None)
     for value in attribute_values:
-        if value == 'None':
+        if value == None:
             idTree[root_attributeLabel][value] = majorityClass #set the None branch to majority class
         else:
             sub_labels = labels[:]
@@ -140,9 +140,8 @@ def NodeSelection(dataTable):
     return selected_attribute  # returns an integer
 
 def classify(inputTree, test_data):
-    '''gut
-    
-    '''
+    '''Takes as an argument a new sample and the decision tree represented as a dictionary.
+    Returns the class classification of the new sample. Also takes care of missing and unexpected attribute values'''
 
     labels = list(test_data.keys())
     test_values = list(test_data.values())
@@ -150,6 +149,8 @@ def classify(inputTree, test_data):
     branches = inputTree[root_node]
     labels_index = labels.index(root_node)
     key = test_values[labels_index]
+    if key not in branches.keys():
+        key = None
     value = branches[key]
     if isinstance(value, dict):
         classLabel = classify(value, test_data)
@@ -157,28 +158,40 @@ def classify(inputTree, test_data):
         classLabel = value
     return classLabel
 
-if __name__ == "__main__":
 
-    # FROM CSV
-    #myDat, labels = createDataTableCsv(training_data1) #for given training data
-    #mytree1 = createTree(myDat, labels)
+def main():
+
+    ####### FROM CSV FILE #######
+    myDat, labels = createDataTableCsv(training_data1) #for given training data
+    mytree1 = createTree(myDat, labels)
     #print(mytree1)
 
-    #test_plant = {'sepal length':4.6, 'sepal width':3.4, 'petal length':1.4, 'petal width':0.2}
-    #answer = classify(mytree1, test_plant)
-    #print(answer)
+    test_plant1 = {'sepal length':4.6, 'sepal width':3.4, 'petal length':1.4, 'petal width':0.2}
+    test_plant2 = {'sepal width': 3.4, 'petal length': 1.4, 'petal width': 0.2} # testing missing values (sepal length is missing)
 
-    # FOR HW
+    answerPlant1 = classify(mytree1, test_plant1)
+    answerPlant2 = classify(mytree1, test_plant2)
+    print("Test_plant1 is: " + answerPlant1)
+    print("Test_plant2 is: " + answerPlant2)
+
+    ######## FROM HW SAMPLE #######
     myDat1, labels1 = createDataTable(training_data2)  # for given training data
     mytree2 = createTree(myDat1, labels1)
-    print(mytree2)
+    #print(mytree2)
 
     #print((answer)
-    test1 = {"level" : "Junior","lang" : "Java","tweets" : "yes","phd" : "no"}  #True
-    test2 = {"level" : "Junior","lang" : "Java","tweets" : "yes","phd" : "yes"} #False
-    answer1 = classify(mytree2, test1)
-    answer2 = classify(mytree2, test2)
-    print(answer1, answer2)
+    candidate_1 = {"level" : "Junior","lang" : "Java","tweets" : "yes","phd" : "no"}  #True
+    candidate_2 = {"level" : "Junior","lang" : "Java","tweets" : "yes","phd" : "yes"} #False
+
+    # testing missing/incorrect values
+    candidate_3 = {"level": "Intern", "lang": "Java", "tweets": "yes", "phd": "yes"}  # incorrect value: Intern (Should return True)
+
+    answer1 = classify(mytree2, candidate_1)
+    answer2 = classify(mytree2, candidate_2)
+    answer3 = classify(mytree2, candidate_3)
+    print("Candidate_1:  " ,  answer1 , "\nCandidate_2: " , answer2 , "\nCandidate_3: " , answer3)
 
     #print(createDataTable(training_data2))
     #print(createDataTableCsv(training_data1))
+
+main()

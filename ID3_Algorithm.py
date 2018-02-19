@@ -31,8 +31,40 @@ def createDataTableCsv(data):
 
     dataLabels= ['sepal length', 'sepal width', 'petal length', 'petal width']
     dataTable = training_data1.values.tolist() # Use .values to get a numpy.array and then .tolist() to get a list.
+<<<<<<< Updated upstream
     dataTable.append(dataLabels)
     return dataTable, dataLabels
+||||||| merged common ancestors
+    #print(dataTable)
+    shuffle(dataTable)
+    #print("HOPOOOOODADASPDASDPOASD",dataTable)
+    #print()
+    training_size = int(len(dataTable)*.9)   #90 percent
+    #print("90% of the size: ",training_size)
+    #print("remaining: ", len(dataTable)-training_size)
+    dataTable_training = list(dataTable[0:training_size])
+    dataTable_testing = list(dataTable[training_size:])
+    #print(len(dataTable_training),len(dataTable_testing))
+    #dataTable.append(dataTable_training)
+    dataTable_testing_dict = {}
+    for label in dataLabels:
+        for data in dataTable_testing:
+            dataTable_test_dict[label] = data
+    return dataTable_training, dataLabels
+=======
+    #print(dataTable)
+    shuffle(dataTable)
+    #print("HOPOOOOODADASPDASDPOASD",dataTable)
+    #print()
+    training_size = int(len(dataTable)*.9)   #90 percent
+    #print("90% of the size: ",training_size)
+    #print("remaining: ", len(dataTable)-training_size)
+    dataTable_training = list(dataTable[0:training_size])
+    dataTable_testing = list(dataTable[training_size:])
+    #print(len(dataTable_training),len(dataTable_testing))
+    #dataTable.append(dataTable_training)
+    return dataTable_training, dataLabels
+>>>>>>> Stashed changes
 
 def createDataTable(data):
     '''
@@ -169,6 +201,32 @@ def main():
     test_plant1 = {'sepal length':4.6, 'sepal width':3.4, 'petal length':1.4, 'petal width':0.2}
     test_plant2 = {'sepal width': 3.4, 'petal length': 1.4, 'petal width': 0.2} # testing missing values (sepal length is missing)
 
+<<<<<<< Updated upstream
+||||||| merged common ancestors
+
+    
+    index = 0
+    temp_dict = {}
+    for test_data in dataTable_testing:
+        for data in test_data:
+            temp_dict[labels[index]] = data
+            index++
+            break
+        print(classify(mytree1,test_data[:-1]))
+
+=======
+
+    
+    #index = 0
+    #temp_dict = {}
+    #for test_data in dataTable_testing:
+    #    for data in test_data:
+    #        temp_dict[labels[index]] = data
+    #        index++
+    #        break
+    #    print(classify(mytree1,test_data[:-1]))
+
+>>>>>>> Stashed changes
     answerPlant1 = classify(mytree1, test_plant1)
     answerPlant2 = classify(mytree1, test_plant2)
     print("Test_plant1 is: " + answerPlant1)
@@ -193,5 +251,22 @@ def main():
 
     #print(createDataTable(training_data2))
     #print(createDataTableCsv(training_data1))
+<<<<<<< Updated upstream
 
 main()
+||||||| merged common ancestors
+    print(dataTable_testing,len(dataTable_testing))
+    
+main()
+=======
+    print(dataTable_testing,len(dataTable_testing))
+
+
+    dataLabels = ['sepal length', 'sepal width', 'petal length', 'petal width']
+    values = [dataTable_testing][0]
+
+    dictionary = dict(zip(dataLabels, values))
+    print("dictionary" , dictionary)
+
+main()
+>>>>>>> Stashed changes

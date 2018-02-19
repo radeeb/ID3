@@ -6,7 +6,7 @@ import pandas as pd
 training_data1 = pd.read_csv('iris.csv') #read the csv file into a dataframe
 
 training_data2 = [
-({'level':'Senior', 'lang':'Java', 'tweets':'no', 'phd':'no'}, False),
+({'level':'Intern', 'lang':'Java', 'tweets':'no', 'phd':'no'}, False),
 ({'level':'Senior', 'lang':'Java', 'tweets':'no', 'phd':'yes'}, False),
 ({'level':'Mid', 'lang':'Python', 'tweets':'no', 'phd':'no'}, True),
 ({'level':'Junior', 'lang':'Python', 'tweets':'no', 'phd':'no'}, True),
@@ -22,7 +22,7 @@ training_data2 = [
 ({'level':'Junior', 'lang':'Python', 'tweets':'no', 'phd':'yes'}, False)
 ]
 
-
+#first one senio
 def createDataTableCsv(data):
     '''
     Takes data in form of pandas dataFrame that was extracted from .csv file. Note that the labels are manually
@@ -77,9 +77,13 @@ def createTree(dataTable, labels):
     del (labels[root_attribute])  # reducing the dataTable so the recursion will work
     attributeValuesAll = [row[root_attribute] for row in dataTable]
     attribute_values = set(attributeValuesAll)  # finding the unique values
+    attribute_values.add('None')
     for value in attribute_values:
-        sub_labels = labels[:]
-        idTree[root_attributeLabel][value] = createTree(createSubtable(dataTable, root_attribute, value), sub_labels)
+        if value == 'None':
+            idTree[root_attributeLabel][value] = {'None': 'True'}
+        else:
+            sub_labels = labels[:]
+            idTree[root_attributeLabel][value] = createTree(createSubtable(dataTable, root_attribute, value), sub_labels)
     return idTree
 
 def entropy(dataTable):
@@ -152,18 +156,18 @@ def classify(inputTree, test_data):
 if __name__ == "__main__":
 
     # FROM CSV
-    myDat, labels = createDataTableCsv(training_data1) #for given training data
-    mytree1 = createTree(myDat, labels)
+    #myDat, labels = createDataTableCsv(training_data1) #for given training data
+    #mytree1 = createTree(myDat, labels)
     #print(mytree1)
 
-    test_plant = {'sepal length':4.6, 'sepal width':3.4, 'petal length':1.4, 'petal width':0.2}
-    answer = classify(mytree1, test_plant)
-    print(answer)
+    #test_plant = {'sepal length':4.6, 'sepal width':3.4, 'petal length':1.4, 'petal width':0.2}
+    #answer = classify(mytree1, test_plant)
+    #print(answer)
 
     # FOR HW
     myDat1, labels1 = createDataTable(training_data2)  # for given training data
     mytree2 = createTree(myDat1, labels1)
-    #print(mytree2)
+    print(mytree2)
 
     #print((answer)
     test1 = {"level" : "Junior","lang" : "Java","tweets" : "yes","phd" : "no"}  #True

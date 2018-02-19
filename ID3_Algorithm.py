@@ -1,3 +1,8 @@
+"""
+CSC 635 Data Mining Assignment 1
+Written by Radeeb Bashir(radeeb102) and JunHyeong Lee(junhyeong123)
+2/19/2018
+"""
 
 from math import log
 from collections import Counter

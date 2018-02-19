@@ -80,7 +80,7 @@ def createTree(dataTable, labels):
     attribute_values.add('None')
     for value in attribute_values:
         if value == 'None':
-            idTree[root_attributeLabel][value] = {'None': 'True'}
+            idTree[root_attributeLabel][value] = 'True'
         else:
             sub_labels = labels[:]
             idTree[root_attributeLabel][value] = createTree(createSubtable(dataTable, root_attribute, value), sub_labels)

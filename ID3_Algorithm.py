@@ -1,3 +1,5 @@
+'''ID3 ALGORTHM
+Radeeb Bashir and JunHyeong Lee'''
 
 from math import log
 from collections import Counter

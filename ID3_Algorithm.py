@@ -67,6 +67,10 @@ def createTree(dataTable, labels):
     '''
 
     decision = [row[-1] for row in dataTable]
+
+    dataCounter = Counter(decision) #to find the most common class
+    majorityClass = str(dataCounter.most_common(1)[0][0]) #set the value to majorityClass
+
     if decision.count(decision[0]) == len(decision):
         return decision[0]              # return when all of the decision in the dataTable is same
     if len(dataTable[0]) == 1:
@@ -80,7 +84,7 @@ def createTree(dataTable, labels):
     attribute_values.add('None')
     for value in attribute_values:
         if value == 'None':
-            idTree[root_attributeLabel][value] = 'True'
+            idTree[root_attributeLabel][value] = majorityClass #set the None branch to majority class
         else:
             sub_labels = labels[:]
             idTree[root_attributeLabel][value] = createTree(createSubtable(dataTable, root_attribute, value), sub_labels)
@@ -137,7 +141,7 @@ def NodeSelection(dataTable):
 
 def classify(inputTree, test_data):
     '''gut
-
+    
     '''
 
     labels = list(test_data.keys())

@@ -23,7 +23,8 @@ training_data2 = [
 ({'level':'Junior', 'lang':'Python', 'tweets':'no', 'phd':'yes'}, False)
 ]
 
-dataTable_testing = []
+dataTable_testing = []     # Stores the 10% of the sample after the randomization.
+dataLabelsCSV_copy = ['sepal length', 'sepal width', 'petal length', 'petal width']
 
 #first one senio
 def createDataTableCsv(data):
@@ -31,25 +32,16 @@ def createDataTableCsv(data):
     Takes data in form of pandas dataFrame that was extracted from .csv file. Note that the labels are manually
     typed in. As long as the data from .csv can return list of dataTable and list of dataLabels, the algorithm should work.
     '''
+    
     global dataTable_testing
-    dataLabels= ['sepal length', 'sepal width', 'petal length', 'petal width']
+    dataLabelsCSV = ['sepal length', 'sepal width', 'petal length', 'petal width']
     dataTable = training_data1.values.tolist() # Use .values to get a numpy.array and then .tolist() to get a list.
-    #print(dataTable)
     shuffle(dataTable)
-    #print("HOPOOOOODADASPDASDPOASD",dataTable)
-    #print()
-    training_size = int(len(dataTable)*.9)   #90 percent
-    #print("90% of the size: ",training_size)
-    #print("remaining: ", len(dataTable)-training_size)
+    training_size = int(len(dataTable)*.9)   #90 percent of the sample after the randomization.
     dataTable_training = list(dataTable[0:training_size])
     dataTable_testing = list(dataTable[training_size:])
-    #print(len(dataTable_training),len(dataTable_testing))
-    #dataTable.append(dataTable_training)
-    dataTable_testing_dict = {}
-    for label in dataLabels:
-        for data in dataTable_testing:
-            dataTable_test_dict[label] = data
-    return dataTable_training, dataLabels
+    
+    return dataTable_training, dataLabelsCSV
 
 def createDataTable(data):
     '''
@@ -177,38 +169,34 @@ def classify(inputTree, test_data):
 
 
 def main():
-
+    
     ####### FROM CSV FILE #######
+    global dataLabelsCSV_copy   # Copy of the dataLable used for testing purpose.
     myDat, labels = createDataTableCsv(training_data1) #for given training data
-    print(myDat, labels)
-    mytree1 = createTree(myDat, labels)
+    mytree1 = createTree(myDat, labels)   # tree creation for the data from the web
     #print(mytree1)
 
     test_plant1 = {'sepal length':4.6, 'sepal width':3.4, 'petal length':1.4, 'petal width':0.2}
     test_plant2 = {'sepal width': 3.4, 'petal length': 1.4, 'petal width': 0.2} # testing missing values (sepal length is missing)
 
-
-    
-    index = 0
-    temp_dict = {}
-    for test_data in dataTable_testing:
-        for data in test_data:
-            temp_dict[labels[index]] = data
-            index++
-            break
-        print(classify(mytree1,test_data[:-1]))
-
     answerPlant1 = classify(mytree1, test_plant1)
     answerPlant2 = classify(mytree1, test_plant2)
     print("Test_plant1 is: " + answerPlant1)
     print("Test_plant2 is: " + answerPlant2)
+    
+    ##### testing random 10% of the sample #####
+    
+    for test_data in dataTable_testing:
+        #print("correct classification: ", test_data[-1])
+        temp_dict = dict(zip(dataLabelsCSV_copy,test_data[:-1]))
+        print("is prediection correct? ", classify(mytree1, temp_dict) == test_data[-1])
 
     ######## FROM HW SAMPLE #######
     myDat1, labels1 = createDataTable(training_data2)  # for given training data
-    mytree2 = createTree(myDat1, labels1)
+    mytree2 = createTree(myDat1, labels1)# tree creation for the data from the assignment
     #print(mytree2)
 
-    #print((answer)
+    #print(answer)
     candidate_1 = {"level" : "Junior","lang" : "Java","tweets" : "yes","phd" : "no"}  #True
     candidate_2 = {"level" : "Junior","lang" : "Java","tweets" : "yes","phd" : "yes"} #False
 
@@ -220,8 +208,5 @@ def main():
     answer3 = classify(mytree2, candidate_3)
     print("Candidate_1:  " ,  answer1 , "\nCandidate_2: " , answer2 , "\nCandidate_3: " , answer3)
 
-    #print(createDataTable(training_data2))
-    #print(createDataTableCsv(training_data1))
-    print(dataTable_testing,len(dataTable_testing))
     
 main()

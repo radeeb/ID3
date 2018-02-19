@@ -2,6 +2,7 @@
 from math import log
 from collections import Counter
 import pandas as pd
+from random import shuffle
 
 training_data1 = pd.read_csv('iris.csv') #read the csv file into a dataframe
 
@@ -22,17 +23,33 @@ training_data2 = [
 ({'level':'Junior', 'lang':'Python', 'tweets':'no', 'phd':'yes'}, False)
 ]
 
+dataTable_testing = []
+
 #first one senio
 def createDataTableCsv(data):
     '''
     Takes data in form of pandas dataFrame that was extracted from .csv file. Note that the labels are manually
     typed in. As long as the data from .csv can return list of dataTable and list of dataLabels, the algorithm should work.
     '''
-
+    global dataTable_testing
     dataLabels= ['sepal length', 'sepal width', 'petal length', 'petal width']
     dataTable = training_data1.values.tolist() # Use .values to get a numpy.array and then .tolist() to get a list.
-    dataTable.append(dataLabels)
-    return dataTable, dataLabels
+    #print(dataTable)
+    shuffle(dataTable)
+    #print("HOPOOOOODADASPDASDPOASD",dataTable)
+    #print()
+    training_size = int(len(dataTable)*.9)   #90 percent
+    #print("90% of the size: ",training_size)
+    #print("remaining: ", len(dataTable)-training_size)
+    dataTable_training = list(dataTable[0:training_size])
+    dataTable_testing = list(dataTable[training_size:])
+    #print(len(dataTable_training),len(dataTable_testing))
+    #dataTable.append(dataTable_training)
+    dataTable_testing_dict = {}
+    for label in dataLabels:
+        for data in dataTable_testing:
+            dataTable_test_dict[label] = data
+    return dataTable_training, dataLabels
 
 def createDataTable(data):
     '''
@@ -57,7 +74,7 @@ def createSubtable(dataTable, index, value):
     for row in dataTable:
         if row[index] == value:
             chopped_row = row[:index]  # setting the values that are BEFORE the index
-            chopped_row.extend(row[index + 1:])  # setting the value that are AFTER the index
+            chopped_row.extend(row[index+1:])  # setting the value that are AFTER the index
             subDataTable.append(chopped_row) # adding both of them, eventually returning reduced dataTable.
     return subDataTable
 
@@ -74,21 +91,21 @@ def createTree(dataTable, labels):
     if decision.count(decision[0]) == len(decision):
         return decision[0]              # return when all of the decision in the dataTable is same
     if len(dataTable[0]) == 1:
-        return majority_voting(decision)    # return if there is only one remaining feature in dataTable
+        return majority_voting(decision)    # do the majority voting if there is only one remaining feature in dataTable
     root_attribute = NodeSelection(dataTable)
     root_attributeLabel = labels[root_attribute]
-    idTree = {root_attributeLabel: {}}
+    tree = {root_attributeLabel: {}}
     del (labels[root_attribute])  # reducing the dataTable so the recursion will work
     attributeValuesAll = [row[root_attribute] for row in dataTable]
     attribute_values = set(attributeValuesAll)  # finding the unique values
     attribute_values.add(None)
     for value in attribute_values:
         if value == None:
-            idTree[root_attributeLabel][value] = majorityClass #set the None branch to majority class
+            tree[root_attributeLabel][value] = majorityClass #set the None branch to majority class
         else:
             sub_labels = labels[:]
-            idTree[root_attributeLabel][value] = createTree(createSubtable(dataTable, root_attribute, value), sub_labels)
-    return idTree
+            tree[root_attributeLabel][value] = createTree(createSubtable(dataTable, root_attribute, value), sub_labels)
+    return tree
 
 def entropy(dataTable):
     '''
@@ -112,7 +129,7 @@ def majority_voting(decision):
     returns the most popular element from the list given
     '''
 
-    return Counter(decision).most_common()[0][1] > (len(decision) // 2)
+    return Counter(decision).most_common()[0][1]
 
 def NodeSelection(dataTable):
     '''
@@ -133,11 +150,11 @@ def NodeSelection(dataTable):
             subTable = createSubtable(dataTable, i, att)
             probability = len(subTable) / float(len(dataTable))
             finalEntropy += probability * entropy(subTable)
-        information_gain = entropy_for_system - finalEntropy  # calculate the info gain; ie reduction in entropy
-        if information_gain > highest_info_gain:  # compare this to the best gain so far
-            highest_info_gain = information_gain  # if better than current best, set to best
-            selected_attribute = i
-    return selected_attribute  # returns an integer
+        information_gain = entropy_for_system - finalEntropy  # info gain calculation
+        if information_gain > highest_info_gain:  
+            highest_info_gain = information_gain  
+            selected_attribute = i       # choosing the best information gain
+    return selected_attribute  # returns an index of an attribute
 
 def classify(inputTree, test_data):
     '''Takes as an argument a new sample and the decision tree represented as a dictionary.
@@ -163,11 +180,23 @@ def main():
 
     ####### FROM CSV FILE #######
     myDat, labels = createDataTableCsv(training_data1) #for given training data
+    print(myDat, labels)
     mytree1 = createTree(myDat, labels)
     #print(mytree1)
 
     test_plant1 = {'sepal length':4.6, 'sepal width':3.4, 'petal length':1.4, 'petal width':0.2}
     test_plant2 = {'sepal width': 3.4, 'petal length': 1.4, 'petal width': 0.2} # testing missing values (sepal length is missing)
+
+
+    
+    index = 0
+    temp_dict = {}
+    for test_data in dataTable_testing:
+        for data in test_data:
+            temp_dict[labels[index]] = data
+            index++
+            break
+        print(classify(mytree1,test_data[:-1]))
 
     answerPlant1 = classify(mytree1, test_plant1)
     answerPlant2 = classify(mytree1, test_plant2)
@@ -193,5 +222,6 @@ def main():
 
     #print(createDataTable(training_data2))
     #print(createDataTableCsv(training_data1))
-
+    print(dataTable_testing,len(dataTable_testing))
+    
 main()

@@ -1,6 +1,7 @@
 """
 CSC 635 Data Mining Assignment 1
 Written by Radeeb Bashir(radeeb102) and JunHyeong Lee(junhyeong123)
+Trace Folder Name: Radeeb102
 2/19/2018
 """
 

@@ -1,7 +1,14 @@
+"""
+CSC 635 Data Mining Assignment 1
+Written by Radeeb Bashir(radeeb102) and JunHyeong Lee(junhyeong123)
+Trace Folder Name: Radeeb102
+2/19/2018
+"""
 
 from math import log
 from collections import Counter
 import pandas as pd
+from random import shuffle
 
 training_data1 = pd.read_csv('iris.csv') #read the csv file into a dataframe
 
@@ -22,49 +29,27 @@ training_data2 = [
 ({'level':'Junior', 'lang':'Python', 'tweets':'no', 'phd':'yes'}, False)
 ]
 
-#first one senio
+dataTable_testing = []  # Stores the 10% of the sample after the randomization.
+dataLabelsCSV_copy = ['sepal length', 'sepal width', 'petal length', 'petal width']
+
+
+# first one senio
 def createDataTableCsv(data):
     '''
     Takes data in form of pandas dataFrame that was extracted from .csv file. Note that the labels are manually
     typed in. As long as the data from .csv can return list of dataTable and list of dataLabels, the algorithm should work.
     '''
 
-    dataLabels= ['sepal length', 'sepal width', 'petal length', 'petal width']
-    dataTable = training_data1.values.tolist() # Use .values to get a numpy.array and then .tolist() to get a list.
-<<<<<<< Updated upstream
-    dataTable.append(dataLabels)
-    return dataTable, dataLabels
-||||||| merged common ancestors
-    #print(dataTable)
+    global dataTable_testing
+    dataLabelsCSV = ['sepal length', 'sepal width', 'petal length', 'petal width']
+    dataTable = training_data1.values.tolist()  # Use .values to get a numpy.array and then .tolist() to get a list.
     shuffle(dataTable)
-    #print("HOPOOOOODADASPDASDPOASD",dataTable)
-    #print()
-    training_size = int(len(dataTable)*.9)   #90 percent
-    #print("90% of the size: ",training_size)
-    #print("remaining: ", len(dataTable)-training_size)
+    training_size = int(len(dataTable) * .9)  # 90 percent of the sample after the randomization.
     dataTable_training = list(dataTable[0:training_size])
     dataTable_testing = list(dataTable[training_size:])
-    #print(len(dataTable_training),len(dataTable_testing))
-    #dataTable.append(dataTable_training)
-    dataTable_testing_dict = {}
-    for label in dataLabels:
-        for data in dataTable_testing:
-            dataTable_test_dict[label] = data
-    return dataTable_training, dataLabels
-=======
-    #print(dataTable)
-    shuffle(dataTable)
-    #print("HOPOOOOODADASPDASDPOASD",dataTable)
-    #print()
-    training_size = int(len(dataTable)*.9)   #90 percent
-    #print("90% of the size: ",training_size)
-    #print("remaining: ", len(dataTable)-training_size)
-    dataTable_training = list(dataTable[0:training_size])
-    dataTable_testing = list(dataTable[training_size:])
-    #print(len(dataTable_training),len(dataTable_testing))
-    #dataTable.append(dataTable_training)
-    return dataTable_training, dataLabels
->>>>>>> Stashed changes
+
+    return dataTable_training, dataLabelsCSV
+
 
 def createDataTable(data):
     '''
@@ -89,7 +74,7 @@ def createSubtable(dataTable, index, value):
     for row in dataTable:
         if row[index] == value:
             chopped_row = row[:index]  # setting the values that are BEFORE the index
-            chopped_row.extend(row[index + 1:])  # setting the value that are AFTER the index
+            chopped_row.extend(row[index+1:])  # setting the value that are AFTER the index
             subDataTable.append(chopped_row) # adding both of them, eventually returning reduced dataTable.
     return subDataTable
 
@@ -106,21 +91,21 @@ def createTree(dataTable, labels):
     if decision.count(decision[0]) == len(decision):
         return decision[0]              # return when all of the decision in the dataTable is same
     if len(dataTable[0]) == 1:
-        return majority_voting(decision)    # return if there is only one remaining feature in dataTable
+        return majority_voting(decision)    # do the majority voting if there is only one remaining feature in dataTable
     root_attribute = NodeSelection(dataTable)
     root_attributeLabel = labels[root_attribute]
-    idTree = {root_attributeLabel: {}}
+    tree = {root_attributeLabel: {}}
     del (labels[root_attribute])  # reducing the dataTable so the recursion will work
     attributeValuesAll = [row[root_attribute] for row in dataTable]
     attribute_values = set(attributeValuesAll)  # finding the unique values
     attribute_values.add(None)
     for value in attribute_values:
         if value == None:
-            idTree[root_attributeLabel][value] = majorityClass #set the None branch to majority class
+            tree[root_attributeLabel][value] = majorityClass #set the None branch to majority class
         else:
             sub_labels = labels[:]
-            idTree[root_attributeLabel][value] = createTree(createSubtable(dataTable, root_attribute, value), sub_labels)
-    return idTree
+            tree[root_attributeLabel][value] = createTree(createSubtable(dataTable, root_attribute, value), sub_labels)
+    return tree
 
 def entropy(dataTable):
     '''
@@ -144,7 +129,7 @@ def majority_voting(decision):
     returns the most popular element from the list given
     '''
 
-    return Counter(decision).most_common()[0][1] > (len(decision) // 2)
+    return Counter(decision).most_common()[0][1]
 
 def NodeSelection(dataTable):
     '''
@@ -165,11 +150,11 @@ def NodeSelection(dataTable):
             subTable = createSubtable(dataTable, i, att)
             probability = len(subTable) / float(len(dataTable))
             finalEntropy += probability * entropy(subTable)
-        information_gain = entropy_for_system - finalEntropy  # calculate the info gain; ie reduction in entropy
-        if information_gain > highest_info_gain:  # compare this to the best gain so far
-            highest_info_gain = information_gain  # if better than current best, set to best
-            selected_attribute = i
-    return selected_attribute  # returns an integer
+        information_gain = entropy_for_system - finalEntropy  # info gain calculation
+        if information_gain > highest_info_gain:  
+            highest_info_gain = information_gain  
+            selected_attribute = i       # choosing the best information gain
+    return selected_attribute  # returns an index of an attribute
 
 def classify(inputTree, test_data):
     '''Takes as an argument a new sample and the decision tree represented as a dictionary.
@@ -192,52 +177,43 @@ def classify(inputTree, test_data):
 
 
 def main():
-
+    
     ####### FROM CSV FILE #######
+    global dataLabelsCSV_copy   # Copy of the dataLable used for testing purpose.
     myDat, labels = createDataTableCsv(training_data1) #for given training data
-    mytree1 = createTree(myDat, labels)
+    mytree1 = createTree(myDat, labels)   # tree creation for the data from the web
     #print(mytree1)
 
     test_plant1 = {'sepal length':4.6, 'sepal width':3.4, 'petal length':1.4, 'petal width':0.2}
     test_plant2 = {'sepal width': 3.4, 'petal length': 1.4, 'petal width': 0.2} # testing missing values (sepal length is missing)
 
-<<<<<<< Updated upstream
-||||||| merged common ancestors
-
-    
     index = 0
     temp_dict = {}
     for test_data in dataTable_testing:
         for data in test_data:
             temp_dict[labels[index]] = data
-            index++
+            index = index + 1
             break
         print(classify(mytree1,test_data[:-1]))
 
-=======
-
-    
-    #index = 0
-    #temp_dict = {}
-    #for test_data in dataTable_testing:
-    #    for data in test_data:
-    #        temp_dict[labels[index]] = data
-    #        index++
-    #        break
-    #    print(classify(mytree1,test_data[:-1]))
-
->>>>>>> Stashed changes
     answerPlant1 = classify(mytree1, test_plant1)
     answerPlant2 = classify(mytree1, test_plant2)
     print("Test_plant1 is: " + answerPlant1)
     print("Test_plant2 is: " + answerPlant2)
+    
+    ##### testing random 10% of the sample #####
+    
+    for test_data in dataTable_testing:
+        #print("correct classification: ", test_data[-1])
+        temp_dict = dict(zip(dataLabelsCSV_copy,test_data[:-1]))
+        print("is prediection correct? ", classify(mytree1, temp_dict) == test_data[-1])
 
     ######## FROM HW SAMPLE #######
     myDat1, labels1 = createDataTable(training_data2)  # for given training data
-    mytree2 = createTree(myDat1, labels1)
+    mytree2 = createTree(myDat1, labels1)# tree creation for the data from the assignment
     #print(mytree2)
 
-    #print((answer)
+    #print(answer)
     candidate_1 = {"level" : "Junior","lang" : "Java","tweets" : "yes","phd" : "no"}  #True
     candidate_2 = {"level" : "Junior","lang" : "Java","tweets" : "yes","phd" : "yes"} #False
 
@@ -251,22 +227,5 @@ def main():
 
     #print(createDataTable(training_data2))
     #print(createDataTableCsv(training_data1))
-<<<<<<< Updated upstream
 
 main()
-||||||| merged common ancestors
-    print(dataTable_testing,len(dataTable_testing))
-    
-main()
-=======
-    print(dataTable_testing,len(dataTable_testing))
-
-
-    dataLabels = ['sepal length', 'sepal width', 'petal length', 'petal width']
-    values = [dataTable_testing][0]
-
-    dictionary = dict(zip(dataLabels, values))
-    print("dictionary" , dictionary)
-
-main()
->>>>>>> Stashed changes

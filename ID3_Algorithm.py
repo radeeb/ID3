@@ -177,55 +177,45 @@ def classify(inputTree, test_data):
 
 
 def main():
-    
     ####### FROM CSV FILE #######
-    global dataLabelsCSV_copy   # Copy of the dataLable used for testing purpose.
-    myDat, labels = createDataTableCsv(training_data1) #for given training data
-    mytree1 = createTree(myDat, labels)   # tree creation for the data from the web
-    #print(mytree1)
+    global dataLabelsCSV_copy  # Copy of the dataLable used for testing purpose.
+    myDat, labels = createDataTableCsv(training_data1)  # for given training data
+    mytree1 = createTree(myDat, labels)  # tree creation for the data from the web
+    # print(mytree1)
 
-    test_plant1 = {'sepal length':4.6, 'sepal width':3.4, 'petal length':1.4, 'petal width':0.2}
-    test_plant2 = {'sepal width': 3.4, 'petal length': 1.4, 'petal width': 0.2} # testing missing values (sepal length is missing)
-
-    index = 0
-    temp_dict = {}
-    for test_data in dataTable_testing:
-        for data in test_data:
-            temp_dict[labels[index]] = data
-            index = index + 1
-            break
-        print(classify(mytree1,test_data[:-1]))
+    test_plant1 = {'sepal length': 4.6, 'sepal width': 3.4, 'petal length': 1.4, 'petal width': 0.2}
+    test_plant2 = {'sepal width': 3.4, 'petal length': 1.4,
+                   'petal width': 0.2}  # testing missing values (sepal length is missing)
 
     answerPlant1 = classify(mytree1, test_plant1)
     answerPlant2 = classify(mytree1, test_plant2)
     print("Test_plant1 is: " + answerPlant1)
     print("Test_plant2 is: " + answerPlant2)
-    
+
     ##### testing random 10% of the sample #####
-    
+
     for test_data in dataTable_testing:
-        #print("correct classification: ", test_data[-1])
-        temp_dict = dict(zip(dataLabelsCSV_copy,test_data[:-1]))
+        # print("correct classification: ", test_data[-1])
+        temp_dict = dict(zip(dataLabelsCSV_copy, test_data[:-1]))
         print("is prediection correct? ", classify(mytree1, temp_dict) == test_data[-1])
 
     ######## FROM HW SAMPLE #######
     myDat1, labels1 = createDataTable(training_data2)  # for given training data
-    mytree2 = createTree(myDat1, labels1)# tree creation for the data from the assignment
-    #print(mytree2)
+    mytree2 = createTree(myDat1, labels1)  # tree creation for the data from the assignment
+    # print(mytree2)
 
-    #print(answer)
-    candidate_1 = {"level" : "Junior","lang" : "Java","tweets" : "yes","phd" : "no"}  #True
-    candidate_2 = {"level" : "Junior","lang" : "Java","tweets" : "yes","phd" : "yes"} #False
+    # print(answer)
+    candidate_1 = {"level": "Junior", "lang": "Java", "tweets": "yes", "phd": "no"}  # True
+    candidate_2 = {"level": "Junior", "lang": "Java", "tweets": "yes", "phd": "yes"}  # False
 
     # testing missing/incorrect values
-    candidate_3 = {"level": "Intern", "lang": "Java", "tweets": "yes", "phd": "yes"}  # incorrect value: Intern (Should return True)
+    candidate_3 = {"level": "Intern", "lang": "Java", "tweets": "yes",
+                   "phd": "yes"}  # incorrect value: Intern (Should return True)
 
     answer1 = classify(mytree2, candidate_1)
     answer2 = classify(mytree2, candidate_2)
     answer3 = classify(mytree2, candidate_3)
-    print("Candidate_1:  " ,  answer1 , "\nCandidate_2: " , answer2 , "\nCandidate_3: " , answer3)
+    print("Candidate_1:  ", answer1, "\nCandidate_2: ", answer2, "\nCandidate_3: ", answer3)
 
-    #print(createDataTable(training_data2))
-    #print(createDataTableCsv(training_data1))
 
 main()
